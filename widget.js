@@ -24,15 +24,15 @@ function widget(props){
     this.children = props.children
     this.initialized = false
     this.props = props
-    this.clickevents = []
+    this.events = []
     this.render = () => {
            for (let child of this.children) {
                child.render(this.state, this)
             if (!this.initialized) {
                 console.log('INITIAL RENDER FOR' + this.id)
                 this.element.appendChild(child.element)
-                if (child.clickEvent) {
-                    this.clickevents.push([child.id, child.clickEvent])
+                if (child.events.length) {
+                    this.events.push(...child.events)
                 }
             }
            }
@@ -40,8 +40,10 @@ function widget(props){
         return this.element
     }
     this.onload = () => {
-        for (ce of this.clickevents) {
-            document.querySelector('#' + ce[0]).addEventListener('click',e => {
+        for (ce of this.events) {
+            console.log(ce)
+            document.querySelector('#' + ce[2]).addEventListener(ce[0],e => {
+                console.log('linking event for' + ce[2])
                 e.preventDefault()
                 ce[1]()
                 .then(() => {
@@ -101,13 +103,14 @@ function view (render) {
     this.element = document.createElement('div')
     this.initialized = false
     this.renderCB = render
+    this.events = []
     this.render = (props, parentref) => {
         this.parentref = parentref
         // if (!this.props || JSON.stringify(props) !== JSON.stringify(this.props)) {
         //     //This doesn't work maybe have to control state at widget level
         //     //console.log('STATE CHANGE', props, this.props)
         this.props = props//{...props}
-        this.element.innerHTML = this.renderCB(this.props, this)
+        this.element.innerHTML = this.renderCB(this.props, this, this.parentref)
         
         if (!this.initialized) {
             console.log('INITIAL view RENDER')
@@ -117,5 +120,12 @@ function view (render) {
         return true
         // }
         // return false
+    }
+    this.addEvent = (type, callback) => {
+        if (this.initialized) {
+            return;
+        }
+        console.log('added event for ' + this.id)
+        this.events.push([type, callback, this.id])
     }
 }
