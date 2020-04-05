@@ -24,23 +24,43 @@ function widget(props){
     this.children = props.children
     this.initialized = false
     this.props = props
+    this.clickevents = []
     this.render = () => {
            for (let child of this.children) {
-               child.render(this.state)
+               child.render(this.state, this)
             if (!this.initialized) {
                 console.log('INITIAL RENDER FOR' + this.id)
                 this.element.appendChild(child.element)
+                if (child.clickEvent) {
+                    this.clickevents.push([child.id, child.clickEvent])
+                }
             }
            }
            this.initialized = true
         return this.element
     }
     this.onload = () => {
+        for (ce of this.clickevents) {
+            document.querySelector('#' + ce[0]).addEventListener('click',e => {
+                e.preventDefault()
+                ce[1]()
+                .then(() => {
+                    console.log('rerendering')
+                    this.render()
+                })
+            })
+        }
         this.props.onload(this.state)
         .then(res => {
             console.log(this.state)
             console.log('FINISHED ONLOAD')
             this.render()
+        })
+    }
+    this.addClickEvent = (id, cb) => {
+        document.querySelector('#' + id).addEventListener('click', e => {
+            e.preventDefault()
+            console.log('clicking')
         })
     }
 }
@@ -80,12 +100,15 @@ function view (render) {
     this.props = null
     this.element = document.createElement('div')
     this.initialized = false
-    this.render = (props) => {
+    this.renderCB = render
+    this.render = (props, parentref) => {
+        this.parentref = parentref
         // if (!this.props || JSON.stringify(props) !== JSON.stringify(this.props)) {
         //     //This doesn't work maybe have to control state at widget level
         //     //console.log('STATE CHANGE', props, this.props)
-        this.props = {...props}
-        this.element.innerHTML = render(this.props)
+        this.props = props//{...props}
+        this.element.innerHTML = this.renderCB(this.props, this)
+        
         if (!this.initialized) {
             console.log('INITIAL view RENDER')
             this.element = this.element.firstChild
