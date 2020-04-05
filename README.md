@@ -19,11 +19,11 @@ const newsList = new view(({data}) => {
 //Must set self.id and self.clickEvent
 const newsRefreshBtn = new view(function(props, self) {
     self.id = 'newsRefreshBtn'
-    self.clickEvent = async () => {
+    self.addEvent('click', async () => {
         const json = await fetch(`api/getnews`)
         const data = await json.json()
         props.data = data.data[0]
-    }
+    })
     return `<button id="${self.id}">hi</button>`
 })
 
