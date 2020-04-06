@@ -18,7 +18,7 @@ function widget(props){
     this.id = props.id || ''
     this.className = props.class || ''
     this.state = props.state
-    this.element = document.createElement('div')
+    this.element = document.createElement(this.props.baseElement || 'div')
     this.element.id = this.id
     this.element.className = this.className
     this.children = props.children
