@@ -114,7 +114,7 @@ function view (render) {
         
         if (!this.initialized) {
             console.log('INITIAL view RENDER')
-            this.element = this.element.firstChild
+            //this.element = this.element.firstChild
             this.initialized = true
         }
         return true
